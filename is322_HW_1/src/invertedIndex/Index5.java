@@ -86,31 +86,33 @@ public class Index5 {
                     /// -2- **** complete here ****
                     /// **** hint flen += ________________(ln, fid);
                     String[] words = ln.split("\\W+");
+                    flen += words.length;
                     for (String word : words) {
                         word = word.toLowerCase();
                         DictEntry entry = null;
                         if (!index.containsKey(word)) {
                             entry = new DictEntry(1, 1);
-                            entry.addPosting(fid + 1);
+                            entry.addPosting(fid);
                             index.put(word, entry);
                             continue;
                         }
                         entry = index.get(word);
-                        if (entry.getPosting(fid + 1) == 0) {
-                            entry.addPosting(fid + 1);
+                        if (entry.getPosting(fid) == 0) {
+                            entry.addPosting(fid);
                             entry.term_freq++;
                             entry.doc_freq++;
                             continue;
                         }
                         Posting posting = entry.pList;
                         entry.term_freq++;
-                        while (posting.docId != (fid + 1)) {
+                        while (posting.docId != (fid)) {
                             posting = posting.next;
                         }
                         posting.dtf++;
                     }
                 }
                 sources.get(fid).length = flen;
+                flen = 0;
 
             } catch (IOException e) {
                 System.out.println("File " + fileName + " not found. Skip it");
@@ -239,7 +241,11 @@ public class Index5 {
             }
         }
         words = ValidWords.toArray(new String[0]);
-        Posting posting = index.get(words[0].toLowerCase()).pList;
+        len = words.length;
+        Posting posting = null;
+        if(len > 0) {
+            posting = index.get(words[0].toLowerCase()).pList;
+        }
         int i = 1;
         while (i < len) {
             posting = intersect(posting, index.get(words[i].toLowerCase()).pList);
@@ -247,6 +253,7 @@ public class Index5 {
         }
         while (posting != null) {
             // System.out.println("\t" + sources.get(num));
+
             result += "\t" + posting.docId + " - " + sources.get(posting.docId).title + " - "
                     + sources.get(posting.docId).length + "\n";
             posting = posting.next;

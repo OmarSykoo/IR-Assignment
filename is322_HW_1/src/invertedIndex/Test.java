@@ -19,7 +19,7 @@ public class Test {
         Index5 index = new Index5();
         // |** change it to your collection directory
         // |** in windows "C:\\tmp11\\rl\\collection\\"
-        String files = "C:/Users/omaro/Downloads/Compressed/is322_HW_1/is322_HW_1/Documents/";
+        String files = "C:/Users/yussu/OneDrive/Desktop/ir/IR-Assignment/is322_HW_1/Documents/";
 
         File file = new File(files);
         // |** String[] list()
