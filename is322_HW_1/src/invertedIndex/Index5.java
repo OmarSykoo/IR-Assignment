@@ -45,6 +45,7 @@ public class Index5 {
 
     // ---------------------------------------------
     public void printPostingList(Posting p) {
+        // printing the documents id that are linked to a term.
         // Iterator<Integer> it2 = hset.iterator();
         System.out.print("[");
         while (p != null) {
@@ -61,6 +62,8 @@ public class Index5 {
 
     // ---------------------------------------------
     public void printDictionary() {
+        // printing the inverted index.
+
         Iterator it = index.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
@@ -172,12 +175,16 @@ public class Index5 {
 
     // ----------------------------------------------------------------------------
     boolean stopWord(String word) {
+        // check if any word in the document is a stop word so we ignore it later.
+
         if (word.equals("the") || word.equals("to") || word.equals("be") || word.equals("for") || word.equals("from")
                 || word.equals("in")
                 || word.equals("a") || word.equals("into") || word.equals("by") || word.equals("or")
                 || word.equals("and") || word.equals("that")) {
             return true;
         }
+
+        // ignore any word that consists of only one letter.
         if (word.length() < 2) {
             return true;
         }
@@ -233,13 +240,17 @@ public class Index5 {
         return answer;
     }
 
-    public String find_24_01(String phrase) { // any mumber of terms non-optimized search
+    public String find_24_01(String phrase) { // any member of terms non-optimized search
+        // finds if a phrase occurs in a document.
+
         String result = "";
         String[] words = phrase.split("\\W+");
         int len = words.length;
 
         // fix this if word is not in the hash table will crash...
         List<String> ValidWords = new ArrayList<String>();
+
+        // check if the word is in the dictionary or not.
         for (String word : words) {
             if (index.containsKey(word)) {
                 ValidWords.add(word.toLowerCase());
@@ -247,15 +258,21 @@ public class Index5 {
         }
         words = ValidWords.toArray(new String[0]);
         len = words.length;
+
+        // get the posting list of the first word.
         Posting posting = null;
         if(len > 0) {
             posting = index.get(words[0].toLowerCase()).pList;
         }
+
+        // get the rest postings of the rest words and intersect it with the first word's posting.
         int i = 1;
         while (i < len) {
             posting = intersect(posting, index.get(words[i].toLowerCase()).pList);
             i++;
         }
+
+        // storing the documents that the phrase occur in.
         while (posting != null) {
             // System.out.println("\t" + sources.get(num));
 
