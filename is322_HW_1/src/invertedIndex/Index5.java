@@ -205,25 +205,46 @@ public class Index5 {
     // this is basically an AND function that uses two pointers to find the common
     // number in the postings list of pL1 and pL2
     Posting intersect(Posting pL1, Posting pL2) {
-        /// **** -1- complete after each comment ****
+        /// ** -1- complete after each comment **
+
         // INTERSECT ( p1 , p2 )
+
         // 1 answer ← {}
         Posting answer = null;
         Posting last = null;
+
         // 2 while p1 != NIL and p2 != NIL
+        while (pL1 != null && pL2 != null) {
 
-        // 3 do if docID ( p 1 ) = docID ( p2 )
+            // 3 do if docID ( p 1 ) = docID ( p2 )
+            if (pL1.docId == pL2.docId) {
 
-        // 4 then ADD ( answer, docID ( p1 ))
-        // answer.add(pL1.docId);
+                // 4 then ADD ( answer, docID ( p1 ))
+                Posting newNode = new Posting(pL1.docId);
 
-        // 5 p1 ← next ( p1 )
-        // 6 p2 ← next ( p2 )
+                if (answer == null) {
+                    answer = newNode;
+                } else {
+                    last.next = newNode;
+                }
+                last = newNode; // Update last pointer
 
-        // 7 else if docID ( p1 ) < docID ( p2 )
+                // 5 p1 ← next ( p1 )
+                // 6 p2 ← next ( p2 )
+                pL1 = pL1.next;
+                pL2 = pL2.next;
 
-        // 8 then p1 ← next ( p1 )
-        // 9 else p2 ← next ( p2 )
+                // 7 else if docID ( p1 ) < docID ( p2 )
+            } else if (pL1.docId < pL2.docId) {
+
+                // 8 then p1 ← next ( p1 )
+                pL1 = pL1.next;
+
+                // 9 else p2 ← next ( p2 )
+            } else {
+                pL2 = pL2.next;
+            }
+        }
 
         // 10 return answer
         return answer;
@@ -235,12 +256,27 @@ public class Index5 {
         int len = words.length;
 
         // fix this if word is not in the hash table will crash...
-        Posting posting = index.get(words[0].toLowerCase()).pList;
-        int i = 1;
+        int i = 0;
+        Posting posting = null;
+        // find first matching
         while (i < len) {
-            posting = intersect(posting, index.get(words[i].toLowerCase()).pList);
+            // lma nla2y first matching add it in posting w break
+            if (index.containsKey(words[i].toLowerCase())) {
+                posting = index.get(words[i].toLowerCase()).pList;
+                i++;
+                break;
+            }
             i++;
         }
+
+        // intersect el posting lists
+        while (i < len) {
+            if (index.containsKey(words[i].toLowerCase())) {
+                posting = intersect(posting, index.get(words[i].toLowerCase()).pList);
+            }
+            i++;
+        }
+
         while (posting != null) {
             // System.out.println("\t" + sources.get(num));
             result += "\t" + posting.docId + " - " + sources.get(posting.docId).title + " - "
