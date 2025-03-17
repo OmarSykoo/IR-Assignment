@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 
 /**
  *
@@ -19,7 +20,8 @@ public class Test {
         Index5 index = new Index5();
         // |** change it to your collection directory
         // |** in windows "C:\\tmp11\\rl\\collection\\"
-        String files = "C:/Users/yussu/OneDrive/Desktop/ir/IR-Assignment/is322_HW_1/Documents/";
+        System.out.println();
+        String files = Paths.get("").toAbsolutePath().resolve("Documents").toString() + File.separator;
 
         File file = new File(files);
         // |** String[] list()

@@ -81,7 +81,8 @@ public class Index5 {
                 }
                 String ln;
                 int flen = 0;
-                //adding the words to the inverted index and tracking its frequency with the entry 
+                // adding the words to the inverted index and tracking its frequency with the
+                // entry
                 while ((ln = file.readLine()) != null) {
                     /// -2- **** complete here ****
                     /// **** hint flen += ________________(ln, fid);
@@ -90,28 +91,31 @@ public class Index5 {
                     for (String word : words) {
                         word = word.toLowerCase();
                         DictEntry entry = null;
-                        //if its the first time seeing the word we add it with document frequency and term frequency = 1
+                        // if its the first time seeing the word we add it with document frequency and
+                        // term frequency = 1
                         if (!index.containsKey(word)) {
                             entry = new DictEntry(1, 1);
                             entry.addPosting(fid);
                             index.put(word, entry);
                             continue;
                         }
-                        //check if the word is duplicated
+                        // check if the word is duplicated
                         entry = index.get(word);
-                        if (entry.getPosting(fid) == 0) { // if this condition is true then add the word but its in another document so we add the doc frequency too
+                        if (entry.getPosting(fid) == 0) { // if this condition is true then add the word but its in
+                                                          // another document so we add the doc frequency too
                             entry.addPosting(fid);
                             entry.term_freq++;
                             entry.doc_freq++;
                             continue;
                         }
-                        // if we reach this part then we add the term frequency only as it means the word is duplicated in the same document
+                        // if we reach this part then we add the term frequency only as it means the
+                        // word is duplicated in the same document
                         Posting posting = entry.pList;
                         entry.term_freq++;
                         while (posting.docId != (fid)) {
                             posting = posting.next;
                         }
-                        //increment document term frequency in the postings list
+                        // increment document term frequency in the postings list
                         posting.dtf++;
                     }
                 }
@@ -198,7 +202,8 @@ public class Index5 {
     }
 
     // ----------------------------------------------------------------------------
-    // this is basically an AND function that uses two pointers to find the common number in the postings list of pL1 and pL2
+    // this is basically an AND function that uses two pointers to find the common
+    // number in the postings list of pL1 and pL2
     Posting intersect(Posting pL1, Posting pL2) {
         /// **** -1- complete after each comment ****
         // INTERSECT ( p1 , p2 )
@@ -206,73 +211,38 @@ public class Index5 {
         Posting answer = null;
         Posting last = null;
         // 2 while p1 != NIL and p2 != NIL
-        while (pL1 != null && pL2 != null) {
-            // 3 do if docID ( p 1 ) = docID ( p2 )
-            if (pL1.docId == pL2.docId) {
-                // 4 then ADD ( answer, docID ( p1 ))
-                // answer.add(pL1.docId);
-                if (answer == null) {
-                    answer = new Posting(pL1.docId, pL1.dtf);
-                    last = answer;
-                } else {
-                    last.next = new Posting(pL1.docId, pL1.dtf);
-                    last = last.next;
-                }
-                // 5 p1 ← next ( p1 )
-                // 6 p2 ← next ( p2 )
-                pL1 = pL1.next;
-                pL2 = pL2.next;
-            }
-            // 7 else if docID ( p1 ) < docID ( p2 )
-            else if (pL1.docId < pL2.docId) {
-                // 8 then p1 ← next ( p1 )
-                pL1 = pL1.next;
-            } else {
-                // 9 else p2 ← next ( p2 )
-                pL2 = pL2.next;
-            }
-        }
+
+        // 3 do if docID ( p 1 ) = docID ( p2 )
+
+        // 4 then ADD ( answer, docID ( p1 ))
+        // answer.add(pL1.docId);
+
+        // 5 p1 ← next ( p1 )
+        // 6 p2 ← next ( p2 )
+
+        // 7 else if docID ( p1 ) < docID ( p2 )
+
+        // 8 then p1 ← next ( p1 )
+        // 9 else p2 ← next ( p2 )
 
         // 10 return answer
         return answer;
     }
 
     public String find_24_01(String phrase) { // any member of terms non-optimized search
-        // finds if a phrase occurs in a document.
-
         String result = "";
         String[] words = phrase.split("\\W+");
         int len = words.length;
 
         // fix this if word is not in the hash table will crash...
-        List<String> ValidWords = new ArrayList<String>();
-
-        // check if the word is in the dictionary or not.
-        for (String word : words) {
-            if (index.containsKey(word)) {
-                ValidWords.add(word.toLowerCase());
-            }
-        }
-        words = ValidWords.toArray(new String[0]);
-        len = words.length;
-
-        // get the posting list of the first word.
-        Posting posting = null;
-        if(len > 0) {
-            posting = index.get(words[0].toLowerCase()).pList;
-        }
-
-        // get the rest postings of the rest words and intersect it with the first word's posting.
+        Posting posting = index.get(words[0].toLowerCase()).pList;
         int i = 1;
         while (i < len) {
             posting = intersect(posting, index.get(words[i].toLowerCase()).pList);
             i++;
         }
-
-        // storing the documents that the phrase occur in.
         while (posting != null) {
             // System.out.println("\t" + sources.get(num));
-
             result += "\t" + posting.docId + " - " + sources.get(posting.docId).title + " - "
                     + sources.get(posting.docId).length + "\n";
             posting = posting.next;
