@@ -195,6 +195,7 @@ public class Index5 {
     }
 
     // ----------------------------------------------------------------------------
+    // this is basically an AND function that uses two pointers to find the common number in the postings list of pL1 and pL2
     Posting intersect(Posting pL1, Posting pL2) {
         /// **** -1- complete after each comment ****
         // INTERSECT ( p1 , p2 )
