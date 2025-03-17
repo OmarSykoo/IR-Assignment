@@ -82,6 +82,7 @@ public class Index5 {
                 }
                 String ln;
                 int flen = 0;
+                //adding the words to the inverted index and tracking its frequency with the entry 
                 while ((ln = file.readLine()) != null) {
                     /// -2- **** complete here ****
                     /// **** hint flen += ________________(ln, fid);
@@ -90,24 +91,28 @@ public class Index5 {
                     for (String word : words) {
                         word = word.toLowerCase();
                         DictEntry entry = null;
+                        //if its the first time seeing the word we add it with document frequency and term frequency = 1
                         if (!index.containsKey(word)) {
                             entry = new DictEntry(1, 1);
                             entry.addPosting(fid);
                             index.put(word, entry);
                             continue;
                         }
+                        //check if the word is duplicated
                         entry = index.get(word);
-                        if (entry.getPosting(fid) == 0) {
+                        if (entry.getPosting(fid) == 0) { // if this condition is true then add the word but its in another document so we add the doc frequency too
                             entry.addPosting(fid);
                             entry.term_freq++;
                             entry.doc_freq++;
                             continue;
                         }
+                        // if we reach this part then we add the term frequency only as it means the word is duplicated in the same document
                         Posting posting = entry.pList;
                         entry.term_freq++;
                         while (posting.docId != (fid)) {
                             posting = posting.next;
                         }
+                        //increment document term frequency in the postings list
                         posting.dtf++;
                     }
                 }
