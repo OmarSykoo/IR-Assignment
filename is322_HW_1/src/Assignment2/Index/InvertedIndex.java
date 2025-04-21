@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -66,29 +67,43 @@ public class InvertedIndex {
         return idf;
     }
 
-    public void Print() {
-        // Print tokens header
-        System.out.println("Tokens:");
-        for (String word : Postings.keySet()) {
-            System.out.printf("%-12s", word); // left-align with 12-character width
+    public void Query(String Query) {
+        List<Double> QueryEmbeding = CreateEmbedings(Query);
+        Map<Double, List<Source>> similarVectors = new TreeMap<>();
+        for (var entry : DocumentVector.entrySet()) {
+            var similarityValue = CosineSimilarity(QueryEmbeding, entry.getValue());
+            var sources = similarVectors.getOrDefault(-similarityValue, new LinkedList<>());
+            sources.add(Sources.get(entry.getKey()));
+            similarVectors.put(-similarityValue, sources);
         }
-        System.out.println("\n" + "-".repeat(Postings.size() * 12));
-
-        // Print document vectors aligned under tokens
-        for (List<Double> tokenVector : DocumentVector.values()) {
-
-            for (Double value : tokenVector) {
-                System.out.printf("%-12.4f", value); // left-align float with 4 decimals
+        System.out.println("----------------------------------------------------------------");
+        System.out.println(String.format("Querying : %s", Query));
+        System.out.println("----------------------------------------------------------------");
+        for (var entry : similarVectors.entrySet()) {
+            System.out.println(String.format("Similarity score : %.2f", (-entry.getKey())));
+            for (Source source : entry.getValue()) {
+                System.out.print("    ");
+                System.out.println(source.getFilePath());
             }
-
-            System.out.println();
         }
-
     }
 
-    public List<Double> CreateEmbedings(String query) {
+    private double CosineSimilarity(List<Double> list1, List<Double> list2) {
+        double norm1 = 0;
+        double norm2 = 0;
+        double dotProduct = 0;
+        for (int i = 0; i < list1.size(); i++) {
+            norm1 += list1.get(i) * list1.get(i);
+            norm2 += list2.get(i) * list2.get(i);
+            dotProduct += list1.get(i) * list2.get(i);
+        }
+        if (norm1 == 0.0 || norm2 == 0.0)
+            return 0.0;
+        return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
+    }
+
+    private List<Double> CreateEmbedings(String query) {
         String[] words = query.split("\\W+");
-        System.out.println("\n" + "-".repeat(Postings.size() * 12));
         HashMap<String, Integer> WordTF = new HashMap<>();
         for (String word : words) {
             WordTF.put(word, WordTF.getOrDefault(word, 0) + 1);
@@ -97,10 +112,7 @@ public class InvertedIndex {
         for (String word : Postings.keySet()) {
             tokenVector.add(WordTF.getOrDefault(word, 0) * IDF(word));
         }
-        for (Double value : tokenVector) {
-            System.out.printf("%-12.4f", value); // left-align float with 4 decimals
-        }
-        System.out.println();
+
         return tokenVector;
     }
 }

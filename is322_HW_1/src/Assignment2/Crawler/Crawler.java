@@ -17,22 +17,30 @@ public class Crawler {
 
     private static HashSet<String> visited = new HashSet<>();
     private static HashMap<String, String> pages = new HashMap<>();
-
+    private static String MainUrl = "https://en.wikipedia.org/";
     private static int currentCrawlCount = 0;
 
     public Crawler(String directoryPath) {
         this.directoryPath = directoryPath;
     }
 
-    public static void crawl(String url, int depth) {
-        if (depth == 0 || visited.contains(url) || !url.startsWith("https://en.wikipedia.org/")
-                || currentCrawlCount >= MAX_DOCS_PER_CRAWL)
+    public static void crawl(String url) {
+        if (visited.contains(url) ||
+                !url.startsWith(MainUrl) ||
+                currentCrawlCount >= MAX_DOCS_PER_CRAWL ||
+                url.substring(MainUrl.length()).contains("#") ||
+                url.substring(MainUrl.length()).contains(":") ||
+                url.substring(MainUrl.length()).contains("?"))
             return;
 
         try {
             visited.add(url);
             Document doc = Jsoup.connect(url).get();
+            Element content = doc.selectFirst("#mw-content-text");
+            if (content == null || content.text().length() < 200) // Ignore very short or no content
+                return;
             System.out.println("Title: " + doc.title());
+            System.out.println("Url: " + url);
 
             pages.put(url, doc.html());
             currentCrawlCount++;
@@ -43,7 +51,7 @@ public class Crawler {
             Elements links = doc.select("a[href]");
             for (Element link : links) {
                 String nextUrl = link.absUrl("href");
-                crawl(nextUrl, depth - 1);
+                crawl(nextUrl);
                 if (currentCrawlCount >= MAX_DOCS_PER_CRAWL)
                     break;
             }
