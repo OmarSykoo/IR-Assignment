@@ -22,7 +22,12 @@ public class Test {
         // |** in windows "C:\\tmp11\\rl\\collection\\"
         System.out.println();
         String files = Paths.get("").toAbsolutePath().resolve("Documents").toString() + File.separator;
-
+        Crawler crawler = new Crawler(files);
+        crawler.crawl("https://en.wikipedia.org/wiki/List_of_pharaohs", 2);
+        crawler.resetCrawlCount();
+        crawler.crawl("https://en.wikipedia.org/wiki/Pharaoh", 2);
+        crawler.resetCrawlCount();
+        crawler.saveDocuments();
         File file = new File(files);
         // |** String[] list()
         // |** Returns an array of strings naming the files and directories in the
@@ -35,11 +40,12 @@ public class Test {
         for (int i = 0; i < fileList.length; i++) {
             fileList[i] = files + fileList[i];
         }
+        index.setN(fileList.length);
         index.buildIndex(fileList);
         // index.store("index");
         index.printDictionary();
 
-        String test3 = "data should plain greatest comif chess"; // data should plain greatest comif
+        String test3 = "data should plain greatest comif chess"; // data should plain
         System.out.println("Boo0lean Model result = \n" + index.find_24_01(test3));
 
         String phrase = "";

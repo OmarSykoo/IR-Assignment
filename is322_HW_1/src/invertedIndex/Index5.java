@@ -39,6 +39,25 @@ public class Index5 {
         N = n;
     }
 
+    public double idf(String term) {
+        int df = 0;
+        if (index.containsKey(term))
+            df = index.get(term).doc_freq;
+        return Math.log10((double) N / (double) df);
+    }
+
+    public int tf(String term) {
+        int tf = 0;
+        if (index.containsKey(term))
+            tf = index.get(term).doc_freq;
+        return tf;
+    }
+
+    public double tfWeight(String term) {
+        int tf = tf(term);
+        return 1.0 + Math.log10(tf);
+    }
+
     // ---------------------------------------------
     public void printPostingList(Posting p) {
         // printing the documents id that are linked to a term.
