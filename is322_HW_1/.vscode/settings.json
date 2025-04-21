@@ -1,4 +1,7 @@
 {
     "java.project.sourcePaths": ["src"],
-    "java.project.referencedLibraries": ["lib\\jsoup-1.19.1.jar"]
+    "java.project.referencedLibraries": [
+        "lib\\lombok.jar",
+        "c:\\Users\\omaro\\OneDrive\\Desktop\\SkillHive\\IR-Assignment\\is322_HW_1\\lib\\jsoup-1.19.1.jar"
+    ]
 }

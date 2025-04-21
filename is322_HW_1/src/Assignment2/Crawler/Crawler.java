@@ -1,4 +1,4 @@
-package invertedIndex;
+package Assignment2.Crawler;
 
 import java.io.File;
 import java.io.FileWriter;
