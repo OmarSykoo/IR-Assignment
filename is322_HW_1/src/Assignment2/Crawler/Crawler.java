@@ -17,7 +17,7 @@ public class Crawler {
 
     private static HashSet<String> visited = new HashSet<>();
     private static HashMap<String, String> pages = new HashMap<>();
-    private static String MainUrl = "https://en.wikipedia.org/";
+    private static String MainUrl = "https://en.wikipedia.org/wiki/";
     private static int currentCrawlCount = 0;
 
     public Crawler(String directoryPath) {
@@ -68,7 +68,7 @@ public class Crawler {
 
         int count = 1;
         for (String url : pages.keySet()) {
-            File outFile = new File(dir, "page" + count + ".html");
+            File outFile = new File(dir, String.format("%s.html", url.substring(MainUrl.length())));
             try (FileWriter writer = new FileWriter(outFile)) {
                 writer.write(pages.get(url));
                 System.out.println("Saved: " + outFile.getAbsolutePath());

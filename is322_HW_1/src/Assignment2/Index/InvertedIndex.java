@@ -13,10 +13,10 @@ import lombok.Setter;
 @Setter
 public class InvertedIndex {
     private int N = 0;
-    private HashMap<Integer, Source> Sources = new HashMap<>();
-    private HashMap<String, List<Posting>> Postings = new HashMap<>();
-    private HashMap<String, TokenInfo> Tokens = new HashMap<>();
-    private HashMap<Integer, List<Double>> DocumentVector = new HashMap<>();
+    private Map<Integer, Source> Sources = new TreeMap<>();
+    private Map<String, List<Posting>> Postings = new TreeMap<>();
+    private Map<String, TokenInfo> Tokens = new TreeMap<>();
+    private Map<Integer, List<Double>> DocumentVector = new TreeMap<>();
 
     public InvertedIndex(String[] filePaths) {
 
@@ -103,14 +103,18 @@ public class InvertedIndex {
     }
 
     private List<Double> CreateEmbedings(String query) {
-        String[] words = query.split("\\W+");
-        HashMap<String, Integer> WordTF = new HashMap<>();
+        String[] words = query.toLowerCase().split("\\W+");
+        Map<String, Integer> WordTF = new TreeMap<>();
         for (String word : words) {
+            if (word.isEmpty())
+                continue;
             WordTF.put(word, WordTF.getOrDefault(word, 0) + 1);
         }
         List<Double> tokenVector = new LinkedList<Double>();
         for (String word : Postings.keySet()) {
-            tokenVector.add(WordTF.getOrDefault(word, 0) * IDF(word));
+            var count = WordTF.getOrDefault(word, 0);
+            var freq = count == 0 ? 0 : 1 + Math.log10(count);
+            tokenVector.add(freq * IDF(word));
         }
 
         return tokenVector;

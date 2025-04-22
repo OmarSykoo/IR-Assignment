@@ -25,12 +25,10 @@ public class Source {
 
                 String[] words = ln.split("\\W+");
                 for (String word : words) {
+                    if (word.isEmpty())
+                        continue;
                     word = word.toLowerCase();
-                    if (this.WordsFreq.containsKey(word)) {
-                        this.WordsFreq.put(word, this.WordsFreq.get(word) + 1);
-                    } else {
-                        this.WordsFreq.put(word, 1);
-                    }
+                    WordsFreq.put(word, WordsFreq.getOrDefault(word, 0) + 1);
                 }
             }
         } catch (IOException e) {
