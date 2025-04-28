@@ -13,11 +13,14 @@ import org.jsoup.select.Elements;
 
 public class Crawler {
     private String directoryPath;
+    // the max number of crawls needed to be performed before restarting the count
     private static final int MAX_DOCS_PER_CRAWL = 10;
-
+    // the visited urls
     private static HashSet<String> visited = new HashSet<>();
+    // the pages of the visited urls
     private static HashMap<String, String> pages = new HashMap<>();
     private static String MainUrl = "https://en.wikipedia.org/wiki/";
+    // the crawl count that is to be reset when needed
     private static int currentCrawlCount = 0;
 
     public Crawler(String directoryPath) {
@@ -25,6 +28,8 @@ public class Crawler {
     }
 
     public static void crawl(String url) {
+        // skips the the url that doesn't start with the main url
+        // any url that contain # or : or ? are duplicates so they are filterd
         if (visited.contains(url) ||
                 !url.startsWith(MainUrl) ||
                 currentCrawlCount >= MAX_DOCS_PER_CRAWL ||
@@ -44,11 +49,11 @@ public class Crawler {
 
             pages.put(url, doc.html());
             currentCrawlCount++;
-
+            // stops crawling if the crawl count is reached
             if (currentCrawlCount >= MAX_DOCS_PER_CRAWL)
                 return;
-
             Elements links = doc.select("a[href]");
+
             for (Element link : links) {
                 String nextUrl = link.absUrl("href");
                 crawl(nextUrl);
@@ -60,7 +65,9 @@ public class Crawler {
         }
     }
 
+    // saves the docuemnt in the documents directory
     public void saveDocuments() {
+        // checks if the directory exists and creates it if not
         File dir = new File(directoryPath);
         if (!dir.exists()) {
             dir.mkdirs();
@@ -69,6 +76,7 @@ public class Crawler {
         int count = 1;
         for (String url : pages.keySet()) {
             File outFile = new File(dir, String.format("%s.html", url.substring(MainUrl.length())));
+            // logs the state of the saved file in case of success and failure
             try (FileWriter writer = new FileWriter(outFile)) {
                 writer.write(pages.get(url));
                 System.out.println("Saved: " + outFile.getAbsolutePath());
@@ -79,6 +87,7 @@ public class Crawler {
         }
     }
 
+    // resets the crawl count
     public static void resetCrawlCount() {
         currentCrawlCount = 0;
     }
